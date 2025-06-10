@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Birthday Surprise</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+
+    :root {
+      --color-bg-light: #ffffff;
+      --color-bg-darkfinal: #000000;
+      --color-text-gray: #6b7280;
+      --color-text-dark: #111827;
+      --color-btn-bg: #111827;
+      --color-btn-text: #ffffff;
+      --color-btn-hover-bg: #333c4a;
+      --border-radius: 0.75rem;
+      --shadow-light: rgba(0,0,0,0.07);
+      --shadow-card: rgba(0,0,0,0.1);
+      --transition-fast: 0.3s ease;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background-color: var(--color-bg-light);
+      color: var(--color-text-gray);
+      font-size: 18px;
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 4rem 1rem 4rem;
+      text-align: center;
+      user-select: none;
+      transition: background-color 0.6s ease, color 0.6s ease;
+    }
+
+    main#container {
+      max-width: 720px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+      position: relative;
+    }
+
+    section {
+      background: var(--color-bg-light);
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 18px var(--shadow-light);
+      padding: 3rem 3rem 4rem;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      user-select: text;
+      position: relative;
+      gap: 2rem;
+    }
+    section.active {
+      display: flex;
+    }
+
+    /* Landing page with gradient background card */
+
+    #landing-content {
+      background: linear-gradient(135deg, #ff477e, #d90429);
+      color: white;
+      box-shadow: 0 8px 40px rgba(217,4,41,0.6);
+    }
+
+    #landing-content h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 2.5rem;
+      user-select: text;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1.25rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    button {
+      flex: 1 1 150px;
+      max-width: 260px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      border: none;
+      padding: 1rem 2rem;
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+      user-select: none;
+      outline-offset: 3px;
+    }
+
+    #btn-yes {
+      background-color: #ff477e;
+      color: white;
+      box-shadow: 0 4px 15px rgba(255, 71, 126, 0.6);
+    }
+    #btn-yes:hover,
+    #btn-yes:focus-visible {
+      background-color: #e13e70;
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    #btn-no {
+      background-color: #d90429;
+      color: white;
+      box-shadow: 0 4px 15px rgba(217, 4, 41, 0.6);
+    }
+    #btn-no:hover,
+    #btn-no:focus-visible {
+      background-color: #b10321;
+      transform: scale(1.05);
+      outline: none;
+    }
+    #btn-no:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Popup for "Are u dumb baby" */
+
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.85);
+      background: var(--color-bg-light);
+      color: #d90429;
+      font-weight: 700;
+      padding: 1.5rem 3rem;
+      border-radius: var(--border-radius);
+      box-shadow: 0 10px 35px rgba(217,4,41,0.3);
+      opacity: 0;
+      pointer-events: none;
+      font-size: 1.5rem;
+      z-index: 1000;
+      user-select: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      max-width: 80vw;
+      text-align: center;
+    }
+    #popup.show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    /* Question Page */
+
+    #question-content {
+      position: relative;
+      background: var(--color-bg-light);
+      box-shadow: 0 4px 18px var(--shadow-light);
+      color: var(--color-text-gray);
+      user-select: none;
+    }
+
+    #question-heart {
+      position: absolute;
+      top: 0.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 280px;
+      height: 280px;
+      opacity: 0.12;
+      fill: #f9a8d4;
+      filter: blur(9px);
+      pointer-events: none;
+      user-select: none;
+      z-index: 0;
+    }
+
+    #question-content h2 {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--color-text-dark);
+      margin-bottom: 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .options {
+      display: flex;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 1;
+    }
+    .option-btn {
+      background: white;
+      border: 1.5px solid rgba(0,0,0,0.05);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+      border-radius: var(--border-radius);
+      padding: 1rem 2.5rem;
+      font-weight: 600;
+      font-size: 1.25rem;
+      color: var(--color-text-dark);
+      cursor: pointer;
+      transition: box-shadow 0.3s ease, transform 0.3s ease, border-color 0.3s ease;
+      min-width: 160px;
+      max-width: 240px;
+      user-select: none;
+    }
+    .option-btn:hover,
+    .option-btn:focus-visible {
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      border-color: #cbd5e1;
+      outline: none;
+      transform: translateY(-3px);
+    }
+    .option-btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+    }
+
+    #response-message {
+      margin-top: 3rem;
+      background: #f3f4f6;
+      border-radius: var(--border-radius);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      color: #1f2937;
+      font-weight: 600;
+      padding: 1rem 2rem;
+      font-size: 1.25rem;
+      min-height: 3rem;
+      transition: opacity 0.3s ease;
+      user-select: text;
+      display: none;
+    }
+    #response-message.show {
+      display: block;
+    }
+
+    #next-btn {
+      margin-top: 3rem;
+      padding: 1rem 3rem;
+      border-radius: var(--border-radius);
+      background: var(--color-btn-bg);
+      color: var(--color-btn-text);
+      font-weight: 700;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      max-width: 220px;
+      align-self: center;
+      display: none;
+      user-select: none;
+    }
+    #next-btn.show {
+      display: block;
+    }
+    #next-btn:hover,
+    #next-btn:focus-visible {
+      background-color: var(--color-btn-hover-bg);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    /* Third Page */
+
+    #third-page {
+      background: linear-gradient(135deg, #4b0000 0%, #770707 50%, #120000 100%);
+      color: #ffebe8;
+      box-shadow: 0 12px 35px rgba(75,0,0,0.8);
+    }
+    #third-page h2 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+    }
+    #answer-textarea {
+      width: 100%;
+      max-width: 700px;
+      min-height: 160px;
+      border-radius: var(--border-radius);
+      padding: 1.25rem 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 500;
+      line-height: 1.5;
+      resize: vertical;
+      background-color: rgba(255 255 255 / 0.95);
+      color: #2b0000;
+      box-shadow: 0 0 10px rgba(119,7,7,0.8);
+      border: none;
+      font-family: 'Poppins', sans-serif;
+      outline-offset: 3px;
+      user-select: text;
+      transition: box-shadow 0.3s ease;
+    }
+    #answer-textarea:focus {
+      outline: none;
+      box-shadow: 0 0 15px 5px rgb(255 77 94 / 0.85);
+    }
+    #third-next-btn {
+      margin-top: 3rem;
+      padding: 1rem 3rem;
+      border-radius: var(--border-radius);
+      background: var(--color-btn-bg);
+      color: var(--color-btn-text);
+      font-weight: 700;
+      font-size: 1.25rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      max-width: 220px;
+      align-self: center;
+      user-select: none;
+    }
+    #third-next-btn:hover,
+    #third-next-btn:focus-visible {
+      background-color: var(--color-btn-hover-bg);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    /* Fourth Page */
+
+    #fourth-page {
+      background: var(--color-bg-light);
+      color: var(--color-text-gray);
+      box-shadow: 0 12px 35px var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+    #fourth-page h2 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 3rem;
+      z-index: 2;
+      position: relative;
+    }
+    #fourth-page .btn-group {
+      justify-content: center;
+      z-index: 2;
+      position: relative;
+    }
+    #fourth-page .option-btn {
+      background: var(--color-btn-bg);
+      color: var(--color-btn-text);
+      border-radius: var(--border-radius);
+      padding: 1rem 3rem;
+      font-weight: 700;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      min-width: 220px;
+      margin: 0 0.5rem;
+      user-select: none;
+    }
+    #fourth-page .option-btn:hover,
+    #fourth-page .option-btn:focus-visible {
+      background-color: var(--color-btn-hover-bg);
+      outline: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    }
+    #ring-emoji-bg {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      font-size: 30rem;
+      color: var(--color-btn-bg);
+      opacity: 0.03;
+      transform: translate(-50%, -50%);
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+      line-height: 1;
+      filter: blur(2px);
+      font-family: serif;
+      user-select: none;
+    }
+
+    /* Fifth Page */
+    #fifth-page {
+      background: var(--color-bg-darkfinal);
+      color: #fff;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+      padding-top: 6rem;
+      padding-bottom: 5rem;
+    }
+    #fifth-page h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      user-select: text;
+    }
+    #fifth-page p {
+      font-size: 1.5rem;
+      max-width: 600px;
+      margin-bottom: 3rem;
+      line-height: 1.4;
+      user-select: text;
+    }
+    #surprise-btn {
+      padding: 1rem 3rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border-radius: var(--border-radius);
+      border: none;
+      cursor: pointer;
+      color: var(--color-btn-text);
+      background: var(--color-btn-bg);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      user-select: none;
+      max-width: 220px;
+      align-self: center;
+    }
+    #surprise-btn:hover,
+    #surprise-btn:focus-visible {
+      background-color: var(--color-btn-hover-bg);
+      transform: scale(1.05);
+      outline: none;
+    }
+
+    @media (max-width: 600px) {
+      #landing-content h1,
+      #question-content h2,
+      #third-page h2,
+      #fourth-page h2,
+      #fifth-page h1 {
+        font-size: 36px;
+      }
+      #fourth-page .option-btn,
+      #surprise-btn,
+      #third-next-btn {
+        font-size: 1.1rem;
+        padding: 0.85rem 2.5rem;
+        max-width: 160px;
+      }
+      #ring-emoji-bg {
+        font-size: 20rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="container" role="main">
+
+    <!-- Landing page -->
+    <section id="landing-content" class="active" aria-live="polite" tabindex="-1">
+      <h1>Are you ready for your surprise?</h1>
+      <div class="btn-group" role="group" aria-label="Choose yes or no">
+        <button id="btn-yes" type="button" aria-pressed="false">Yes</button>
+        <button id="btn-no" type="button" aria-pressed="false">No</button>
+      </div>
+    </section>
+
+    <!-- Question page -->
+    <section id="question-content" role="region" aria-label="Gift disappointment question" aria-live="polite" aria-atomic="true" tabindex="-1">
+      <svg id="question-heart" viewBox="0 0 24 24" aria-hidden="true" focusable="false" >
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 
+                 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09C13.09 3.81 
+                 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 
+                 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+
+      <h2>Would you be disappointed if the gift is not up to your mark?</h2>
+      <div class="options" role="list">
+        <button id="option-yes" class="option-btn" role="listitem" type="button">Yes</button>
+        <button id="option-no" class="option-btn" role="listitem" type="button">No</button>
+        <button id="option-love" class="option-btn" role="listitem" type="button">I love you bacha</button>
+      </div>
+      <div id="response-message" aria-live="polite" aria-atomic="true" role="alert" hidden></div>
+      <button id="next-btn" aria-label="Proceed to next question">Next</button>
+    </section>
+
+    <!-- Third page -->
+    <section id="third-page" role="region" aria-label="Moment you liked me question" aria-live="polite" aria-atomic="true" tabindex="-1">
+      <h2>Which moment made you realize you liked me?</h2>
+      <textarea id="answer-textarea" aria-label="Your answer here" placeholder="Type your answer here..."></textarea>
+      <button id="third-next-btn" aria-label="Proceed to next question">Next</button>
+    </section>
+
+    <!-- Fourth page -->
+    <section id="fourth-page" role="region" aria-label="Proposal question" aria-live="polite" aria-atomic="true" tabindex="-1">
+      <div id="ring-emoji-bg" aria-hidden="true">⭕</div>
+      <h2>Do u want me to ever propose you?</h2>
+      <div class="btn-group" role="group" aria-label="Proposal yes or no">
+        <button id="proposal-yes" class="option-btn" type="button">Yes</button>
+        <button id="proposal-no" class="option-btn" type="button">No</button>
+      </div>
+    </section>
+
+    <!-- Fifth page -->
+    <section id="fifth-page" role="region" aria-label="Final birthday message" aria-live="polite" aria-atomic="true" tabindex="-1">
+      <h1>Happy birthday and thank you Yuvika</h1>
+      <p>
+        I love you a lot. You are the best girl of my life and I'll be your best partner of life forever.
+      </p>
+      <button id="surprise-btn" aria-label="Here is your small surprise">Here is your small surprise</button>
+    </section>
+
+  </main>
+
+  <div id="popup" role="alert" aria-live="assertive" aria-atomic="true" aria-relevant="additions" tabindex="-1">
+    Are u dumb baby
+  </div>
+
+  <script>
+    (function() {
+      const btnYes = document.getElementById('btn-yes');
+      const btnNo = document.getElementById('btn-no');
+      const popup = document.getElementById('popup');
+      const landingContent = document.getElementById('landing-content');
+      const questionContent = document.getElementById('question-content');
+      const thirdPage = document.getElementById('third-page');
+      const fourthPage = document.getElementById('fourth-page');
+      const fifthPage = document.getElementById('fifth-page');
+      const body = document.body;
+      const responseMessage = document.getElementById('response-message');
+      const nextBtn = document.getElementById('next-btn');
+      const answerTextarea = document.getElementById('answer-textarea');
+      const thirdNextBtn = document.getElementById('third-next-btn');
+      const surpriseBtn = document.getElementById('surprise-btn');
+
+      const optionYes = document.getElementById('option-yes');
+      const optionNo = document.getElementById('option-no');
+      const optionLove = document.getElementById('option-love');
+
+      const proposalYes = document.getElementById('proposal-yes');
+      const proposalNo = document.getElementById('proposal-no');
+
+      // Popup helper with innerHTML support and corrected timing
+      function showPopup(htmlContent, duration = 2000) {
+        popup.innerHTML = htmlContent;
+        popup.classList.add('show');
+        popup.focus();
+        clearTimeout(popup._timeout);
+        popup._timeout = setTimeout(() => {
+          popup.classList.remove('show');
+          popup.innerHTML = '';
+        }, duration);
+      }
+
+      // Show section and focus it
+      function showSection(section) {
+        document.querySelectorAll('main > section').forEach(s => {
+          s.classList.remove('active');
+          s.style.display = 'none';
+        });
+        section.style.display = 'flex';
+        requestAnimationFrame(() => {
+          section.classList.add('active');
+          section.focus();
+          updateBodyBackground(section.id);
+        });
+      }
+
+      // Update body background and text color depending on page id
+      function updateBodyBackground(pageId) {
+        switch(pageId) {
+          case 'landing-content':
+            body.style.background = 'linear-gradient(135deg, #ff477e, #d90429)';
+            body.style.color = 'white';
+            break;
+          case 'question-content':
+            body.style.background = 'linear-gradient(180deg, #ffe6ea 0%, #ffd1d9 100%)';
+            body.style.color = '#6b7280';
+            break;
+          case 'third-page':
+            body.style.background = 'linear-gradient(135deg, #4b0000 0%, #770707 50%, #120000 100%)';
+            body.style.color = '#ffebe8';
+            break;
+          case 'fourth-page':
+            body.style.background = '#ffffff';
+            body.style.color = '#6b7280';
+            break;
+          case 'fifth-page':
+            body.style.background = '#000000';
+            body.style.color = '#ffffff';
+            break;
+          default:
+            body.style.background = 'linear-gradient(135deg, #ff477e, #d90429)';
+            body.style.color = 'white';
+        }
+      }
+
+      // Navigations
+      function goToQuestionPage() {
+        showSection(questionContent);
+        responseMessage.hidden = true;
+        responseMessage.textContent = '';
+        nextBtn.classList.remove('show');
+      }
+
+      function goToThirdPage() {
+        showSection(thirdPage);
+        const saved = localStorage.getItem('giftLikedMomentAnswer') || '';
+        answerTextarea.value = saved;
+        thirdNextBtn.focus();
+      }
+
+      function goToFourthPage() {
+        showSection(fourthPage);
+      }
+
+      function goToFifthPage() {
+        showSection(fifthPage);
+        surpriseBtn.focus();
+      }
+
+      // Landing page buttons
+      btnNo.addEventListener('click', () => {
+        if (btnNo.textContent.trim().toLowerCase() === 'no') {
+          btnNo.textContent = 'Yes';
+          btnNo.setAttribute('aria-pressed', 'true');
+          btnNo.disabled = true;
+          showPopup('Are u dumb baby', 1200);
+          setTimeout(() => {
+            btnNo.disabled = false;
+          }, 1200);
+        } else {
+          goToQuestionPage();
+        }
+      });
+
+      btnYes.addEventListener('click', goToQuestionPage);
+
+      // Question page option buttons
+      function showResponse(msg) {
+        responseMessage.textContent = msg;
+        responseMessage.hidden = false;
+        nextBtn.classList.add('show');
+        nextBtn.focus();
+      }
+
+      optionYes.addEventListener('click', () => showResponse('Sorry and I tried my best.'));
+      optionNo.addEventListener('click', () => showResponse('Thx u madam 👑'));
+      optionLove.addEventListener('click', () => showResponse('🤗'));
+
+      nextBtn.addEventListener('click', goToThirdPage);
+
+      // Save textarea input
+      answerTextarea.addEventListener('input', e => {
+        localStorage.setItem('giftLikedMomentAnswer', e.target.value);
+      });
+
+      thirdNextBtn.addEventListener('click', goToFourthPage);
+
+      // Fourth page buttons
+      proposalYes.addEventListener('click', goToFifthPage);
+      proposalNo.addEventListener('click', goToFifthPage);
+
+      // Surprise button popup with underlined code popup on last page
+      surpriseBtn.addEventListener('click', () => {
+        showPopup('Give this code to the one symbiote of your life and the code will be <u>Rishika</u>', 3500);
+      });
+
+      // Initialize
+      updateBodyBackground('landing-content');
+      showSection(landingContent);
+
+    })();
+  </script>
+</body>
+</html>
